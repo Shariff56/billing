@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            width: 90%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 5px;
+        }
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Billing System</h2>
+        <input type="text" id="desc" placeholder="Item Name">
+        <input type="number" id="amount" placeholder="Price">
+        <input type="number" id="quantity" placeholder="Quantity" value="1">
+        <button onclick="addItem()">Add Item</button>
+        <h3 class="total">Total: ₹<span id="total">0</span></h3>
+        <ul id="item-list"></ul>
+        <button onclick="clearAll()" style="background-color: red;">Clear All</button>
+    </div>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem('items')) || [];
+        updateUI();
+
+        function addItem() {
+            const desc = document.getElementById('desc').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            if (desc && amount) {
+                items.push({ desc, amount, quantity });
+                localStorage.setItem('items', JSON.stringify(items));
+                document.getElementById('desc').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('quantity').value = '1';
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const list = document.getElementById('item-list');
+            const totalElement = document.getElementById('total');
+            list.innerHTML = '';
+            let total = 0;
+
+            items.forEach((item, index) => {
+                const itemTotal = item.amount * item.quantity;
+                total += itemTotal;
+                const li = document.createElement('li');
+                li.innerHTML = `${item.desc} (x${item.quantity}) - ₹${itemTotal.toFixed(2)} <button onclick="removeItem(${index})">❌</button>`;
+                list.appendChild(li);
+            });
+
+            totalElement.innerText = total.toFixed(2);
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            localStorage.setItem('items', JSON.stringify(items));
+            updateUI();
+        }
+
+        function clearAll() {
+            items = [];
+            localStorage.removeItem('items');
+            updateUI();
+        }
+    </script>
+</body>
+</html>
