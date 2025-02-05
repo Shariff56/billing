@@ -64,6 +64,11 @@
         <h3 class="total">Total: ₹<span id="total">0</span></h3>
         <ul id="item-list"></ul>
         <button onclick="clearAll()" style="background-color: red;">Clear All</button>
+        <h3>Select Items to Compare</h3>
+        <select id="item1"></select>
+        <select id="item2"></select>
+        <button onclick="calculateDifference()">Difference</button>
+        <h3>Difference: ₹<span id="difference">0</span></h3>
     </div>
 
     <script>
@@ -87,7 +92,11 @@
         function updateUI() {
             const list = document.getElementById('item-list');
             const totalElement = document.getElementById('total');
+            const item1Select = document.getElementById('item1');
+            const item2Select = document.getElementById('item2');
             list.innerHTML = '';
+            item1Select.innerHTML = '';
+            item2Select.innerHTML = '';
             let total = 0;
 
             items.forEach((item, index) => {
@@ -96,6 +105,16 @@
                 const li = document.createElement('li');
                 li.innerHTML = `${item.desc} (x${item.quantity}) - ₹${itemTotal.toFixed(2)} <button onclick="removeItem(${index})">❌</button>`;
                 list.appendChild(li);
+
+                let option1 = document.createElement("option");
+                option1.value = index;
+                option1.text = item.desc;
+                item1Select.appendChild(option1);
+
+                let option2 = document.createElement("option");
+                option2.value = index;
+                option2.text = item.desc;
+                item2Select.appendChild(option2);
             });
 
             totalElement.innerText = total.toFixed(2);
@@ -111,6 +130,17 @@
             items = [];
             localStorage.removeItem('items');
             updateUI();
+        }
+
+        function calculateDifference() {
+            const item1Index = document.getElementById('item1').value;
+            const item2Index = document.getElementById('item2').value;
+            if (item1Index !== '' && item2Index !== '' && item1Index !== item2Index) {
+                const item1Total = items[item1Index].amount * items[item1Index].quantity;
+                const item2Total = items[item2Index].amount * items[item2Index].quantity;
+                const difference = Math.abs(item1Total - item2Total);
+                document.getElementById('difference').innerText = difference.toFixed(2);
+            }
         }
     </script>
 </body>
